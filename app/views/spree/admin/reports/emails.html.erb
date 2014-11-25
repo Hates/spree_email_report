@@ -1,0 +1,77 @@
+<% content_for :page_title do %>
+  <%= Spree.t(:emails) %>
+<% end %>
+
+<% content_for :page_actions do %>
+  <li><%= link_to_with_icon 'times', Spree.t(:clear_search), spree.emails_report_admin_reports_url, :class => 'button' %></li>
+  <li><%= link_to_with_icon 'arrow-left', Spree.t(:back_to_reports_list), spree.admin_reports_url, :class => 'button' %></li>
+<% end %>
+
+
+<% content_for :table_filter_title do %>
+  <%= Spree.t(:date_range) %>
+<% end %>
+
+<% content_for :table_filter do %>
+  <%= search_form_for @search, :url => spree.emails_report_admin_reports_path, id: "search_form"  do |s| %>
+    <div class="date-range-filter field align-center">
+      <%= label_tag nil, Spree.t(:start), :class => 'inline' %>
+      <%= s.text_field :completed_at_gt, :class => 'datepicker datepicker-from', :value => datepicker_field_value(params[:q][:completed_at_gt]) %>
+
+      <span class="range-divider">
+        <i class="fa fa-arrow-right"></i>
+      </span>
+
+      <%= s.text_field :completed_at_lt, :class => 'datepicker datepicker-to', :value => datepicker_field_value(params[:q][:completed_at_lt]) %>
+      <%= label_tag nil, Spree.t(:end), :class => 'inline' %>
+    </div>
+
+    <div class="taxon-filter field align-center">
+      <%= label_tag nil, Spree.t(:purchased_an_item_in_taxon), :class => 'inline' %>
+      <%= s.select :line_items_product_taxons_id_eq, @taxons.collect{ |t| [t.name, t.id] }, { include_blank: true }, class: "select2" %>
+    </div>
+
+    <div class="taxon-filter field align-center">
+      <%= label_tag nil, Spree.t(:shipping_country), :class => 'inline' %>
+      <%= s.select :ship_address_country_id_eq, @countries.collect{ |t| [t.name, t.id] }, { include_blank: true}, class: "select2" %>
+    </div>
+
+    <div class="actions filter-actions">
+      <%= button Spree.t(:search), 'search'  %>
+    </div>
+  <% end %>
+<% end %>
+
+<table class="admin-report">
+  <thead>
+    <tr>
+      <th><%= Spree.t(:email) %></th>
+      <th><%= Spree.t(:download) %></th>
+    </tr>
+  </thead>
+  <tbody>
+  <tr class="align-center">
+    <td><%= pluralize @emails.count, "email" %> found</td>
+    <td>
+      <%= link_to spree.admin_reports_url(params.merge(csv: true)) do %>
+        Download CSV
+      <% end %>
+    </td>
+  </tr>
+  </tbody>
+</table>
+
+<table class="admin-report">
+  <thead>
+    <tr>
+      <th><%= Spree.t(:email) %></th>
+    </tr>
+  </thead>
+  <tbody>
+  <% @emails.each do |email| %>
+    <tr class="align-center">
+      <td><%= email %></td>
+    </tr>
+  <% end %>
+  </tbody>
+</table>

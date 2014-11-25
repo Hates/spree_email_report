@@ -1,3 +1,3 @@
 Spree::Core::Engine.routes.draw do
-  # Add your extension routes here
+  get '/admin/reports/emails', to: 'admin/reports#emails', as: 'emails_report_admin_reports'
 end
