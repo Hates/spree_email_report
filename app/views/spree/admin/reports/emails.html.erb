@@ -28,12 +28,12 @@
 
     <div class="taxon-filter field align-center">
       <%= label_tag nil, Spree.t(:purchased_an_item_in_taxon), :class => 'inline' %>
-      <%= s.select :line_items_product_taxons_id_eq, @taxons.collect{ |t| [t.name, t.id] }, { include_blank: true }, class: "select2" %>
+      <%= s.select :line_items_product_taxons_id_in, @taxons.collect{ |t| [t.name, t.id] }, { include_blank: true, selected: nil }, class: "select2" %>
     </div>
 
     <div class="taxon-filter field align-center">
       <%= label_tag nil, Spree.t(:shipping_country), :class => 'inline' %>
-      <%= s.select :ship_address_country_id_eq, @countries.collect{ |t| [t.name, t.id] }, { include_blank: true}, class: "select2" %>
+      <%= s.select :ship_address_country_id_eq, @countries.collect{ |t| [t.name, t.id] }, { include_blank: true, selected: nil }, class: "select2" %>
     </div>
 
     <div class="actions filter-actions">

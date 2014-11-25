@@ -22,6 +22,11 @@ Spree::Admin::ReportsController.class_eval do
 
     params[:q][:s] ||= "completed_at desc"
 
+    if params[:q][:line_items_product_taxons_id_in].present?
+      search_taxon = Spree::Taxon.find(params[:q][:line_items_product_taxons_id_in])
+      params[:q][:line_items_product_taxons_id_in] = Spree::Taxon.where("lft >= ? AND rgt <= ?", search_taxon.lft, search_taxon.rgt).pluck(:id)
+    end
+
     @search = Spree::Order.complete.ransack(params[:q])
     @orders = @search.result
 
