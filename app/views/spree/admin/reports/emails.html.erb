@@ -45,15 +45,27 @@
 <table class="admin-report">
   <thead>
     <tr>
-      <th><%= Spree.t(:email) %></th>
+      <th><%= Spree.t(:results) %></th>
       <th><%= Spree.t(:download) %></th>
     </tr>
   </thead>
   <tbody>
+  <% if @search_taxon %>
+    <tr class="align-center">
+      <td>Taxon</td>
+      <td><%= @search_taxon.name %></td>
+    </tr>
+  <% end %>
+  <% if @search_country %>
+    <tr class="align-center">
+      <td>Country</td>
+      <td><%= @search_country.name %></td>
+    </tr>
+  <% end %>
   <tr class="align-center">
     <td><%= pluralize @emails.count, "email" %> found</td>
     <td>
-      <%= link_to spree.admin_reports_url(params.merge(csv: true)) do %>
+      <%= link_to spree.emails_report_admin_reports_path(csv: true, q: { completed_at_gt: datepicker_field_value(params[:q][:completed_at_gt]), completed_at_lt: datepicker_field_value(params[:q][:completed_at_lt]), line_items_product_taxons_id_in: @search_taxon.try(:id), ship_address_country_id_eq: @search_country.try(:id) }) do %>
         Download CSV
       <% end %>
     </td>

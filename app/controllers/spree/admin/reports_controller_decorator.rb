@@ -23,8 +23,12 @@ Spree::Admin::ReportsController.class_eval do
     params[:q][:s] ||= "completed_at desc"
 
     if params[:q][:line_items_product_taxons_id_in].present?
-      search_taxon = Spree::Taxon.find(params[:q][:line_items_product_taxons_id_in])
-      params[:q][:line_items_product_taxons_id_in] = Spree::Taxon.where("lft >= ? AND rgt <= ?", search_taxon.lft, search_taxon.rgt).pluck(:id)
+      @search_taxon = Spree::Taxon.find(params[:q][:line_items_product_taxons_id_in])
+      params[:q][:line_items_product_taxons_id_in] = Spree::Taxon.where("lft >= ? AND rgt <= ?", @search_taxon.lft, @search_taxon.rgt).pluck(:id)
+    end
+
+    if params[:q][:ship_address_country_id_eq].present?
+      @search_country = Spree::Country.find(params[:q][:ship_address_country_id_eq])
     end
 
     @search = Spree::Order.complete.ransack(params[:q])
@@ -34,6 +38,19 @@ Spree::Admin::ReportsController.class_eval do
     @countries = email_countries
 
     @emails = @orders.pluck(:email).uniq
+
+    if params[:csv].present?
+      csv_output = CSV.generate do |csv|
+        csv << ["Email"]
+        @emails.each do |email|
+          csv << [email]
+        end
+      end
+
+      send_data csv_output,
+        type: 'text/csv; charset=iso-8859-1; header=present',
+        disposition: "attachment; filename=emails.csv"
+    end
   end
 
   private
