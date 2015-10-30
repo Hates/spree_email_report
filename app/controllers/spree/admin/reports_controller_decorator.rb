@@ -6,8 +6,6 @@ Spree::Admin::ReportsController.class_eval do
   end
 
   def emails
-    @search = nil
-
     params[:q] = {} unless params[:q]
 
     if params[:q][:completed_at_gt].blank?
@@ -20,8 +18,6 @@ Spree::Admin::ReportsController.class_eval do
       params[:q][:completed_at_lt] = Time.zone.parse(params[:q][:completed_at_lt]).end_of_day rescue Time.zone.now.end_of_month
     end
 
-    params[:q][:s] ||= "completed_at desc"
-
     if params[:q][:line_items_product_taxons_id_in].present?
       @search_taxon = Spree::Taxon.find(params[:q][:line_items_product_taxons_id_in])
       params[:q][:line_items_product_taxons_id_in] = Spree::Taxon.where("lft >= ? AND rgt <= ?", @search_taxon.lft, @search_taxon.rgt).pluck(:id)
@@ -31,13 +27,14 @@ Spree::Admin::ReportsController.class_eval do
       @search_country = Spree::Country.find(params[:q][:ship_address_country_id_eq])
     end
 
+    params[:q][:s] ||= "completed_at desc"
+
     @search = Spree::Order.complete.ransack(params[:q])
     @orders = @search.result
+    @emails = @orders.pluck(:email).uniq
 
     @taxons = email_taxons
     @countries = email_countries
-
-    @emails = @orders.pluck(:email).uniq
 
     if params[:csv].present?
       csv_output = CSV.generate do |csv|
